@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>About - TextOrigin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="{{ url_for('index') }}" class="logo">
+      <span class="glass"></span><span>Text<strong>Origin</strong></span>
+    </a>
+    <nav class="nav-links">
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('about') }}" class="active">About</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="page">
+    <h2>About TextOrigin</h2>
+    <p>
+      TextOrigin is a simple tool that helps you check if a piece of writing
+      was likely written by a human or by AI. It’s built for students, teachers,
+      and professionals who want quick and clear answers about their text.
+    </p>
+
+    <h3>Our Main Features</h3>
+    <ul class="metrics">
+      <li><strong>Readability:</strong> Shows how easy or hard your text is to read.</li>
+      <li><strong>Vocabulary:</strong> Checks how many different words you use, to see how varied your writing is.</li>
+      <li><strong>Sentence Length:</strong> Measures the average number of words in each sentence, which helps show clarity.</li>
+      <li><strong>Sentiment:</strong> Finds the feeling in your text — Positive 😊, Negative 😡, or Neutral 😐 — so you know the mood it gives off.</li>
+    </ul>
+
+    <p>
+      By combining these features with smart machine learning models,
+      TextOrigin gives you not just a score, but also useful insights
+      into your writing. Our goal is to make AI detection clear, simple,
+      and easy for everyone to use.
+    </p>
+  </section>
+</main>
+
+<footer>
+  <div>© TextOrigin</div>
+  <div class="social">
+    <a href="#">GitHub</a>
+    <a href="#">LinkedIn</a>
+    <a href="mailto:hello@example.com">Email</a>
+  </div>
+</footer>
+</body>
+</html>

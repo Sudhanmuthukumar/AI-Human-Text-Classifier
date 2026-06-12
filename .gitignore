@@ -1,0 +1,4 @@
+data/*.csv
+models/*.pkl
+models/*.json
+__pycache__/

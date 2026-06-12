@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TextOrigin — Human or AI text detector</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="{{ url_for('index') }}" class="logo">
+      <span class="glass"></span><span>Text<strong>Origin</strong></span>
+    </a>
+    <nav class="nav-links">
+      <a href="{{ url_for('index') }}" class="active">Home</a>
+      <a href="{{ url_for('about') }}">About</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<center><h1>Is your text Human or AI?</h1></center>
+<p class="subtitle">
+  Paste your text below and discover its origin instantly — plus readability, style, and even the mood behind it.<br>
+</p>
+
+<section class="hero two-col">
+  <!-- Input -->
+  <div class="input-side">
+    <textarea id="userText" placeholder="Paste text here…"></textarea>
+    <div class="controls">
+      <button id="checkBtn" class="btn default">Check</button>
+      <button id="clearBtn" class="btn clear">Clear</button>
+      
+    </div>
+  </div>
+  
+
+  <!-- Output -->
+  <div class="output-side">
+    <div id="result" class="card" style="display: none;">
+      <div class="percent" id="scoreText"></div>
+      <div class="meter"><i id="meterFill"></i></div>
+      <ul id="breakdown" class="metrics"></ul>
+    </div>
+  </div>
+</section>
+<center><p id="warningMsg" style="color: red; font-weight: 600; display: none;">Please enter some text before checking.</p></center>
+<section class="examples container">
+  <h3>Examples</h3>
+  <p>Try out quick examples to see how TextOrigin works:</p>
+  <div class="controls">
+    <button id="exampleHumanBtn" class="btn default">Human Example</button>
+    <button id="exampleAiBtn" class="btn default">AI Example</button>
+  </div>
+</section>
+
+<footer>
+  <div>© TextOrigin</div>
+  <div class="social">
+    <a href="#">GitHub</a>
+    <a href="#">LinkedIn</a>
+    <a href="mailto:hello@textorigin.example">Email</a>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</body>
+</html>

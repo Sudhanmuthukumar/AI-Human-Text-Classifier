@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <style>
+    /* Layout */
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  color: #333;
+  background: #fafafa;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Header */
+.nav {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 1rem 2rem;
+}
+.nav-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.nav-links a {
+  margin-left: 1.5rem;
+  text-decoration: none;
+  color: #555;
+}
+.nav-links a.active {
+  font-weight: bold;
+  color: #000;
+}
+
+/* Contact Page */
+.contact-page h2 {
+  margin-bottom: 0.5rem;
+}
+.contact-page .intro {
+  margin-bottom: 2rem;
+  color: #666;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+.form-group label {
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+.form-group input,
+.form-group textarea {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #0077ff;
+  border-radius: 10px;
+  outline: none;
+}
+
+/* Button */
+.btn-primary {
+  background: #0077ff;
+  color: #fff;
+  border: none;
+  padding: 0.9rem 1.4rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primary:hover {
+  background: #005fcc;
+}
+
+/* Footer */
+footer {
+  margin-top: 3rem;
+  padding: 1.5rem 2rem;
+  background: #fff;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+footer .social a {
+  margin-left: 1rem;
+  text-decoration: none;
+  color: #555;
+}
+footer .social a:hover {
+  color: #0077ff;
+}
+
+  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Contact — TextOrigin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="{{ url_for('index') }}" class="logo">
+      <span class="glass"></span><span>Text<strong>Origin</strong></span>
+    </a>
+    <nav class="nav-links">
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('about') }}">About</a>
+      <a href="{{ url_for('contact') }}" class="active">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="page">
+    <h2>Get in Touch</h2>
+    <p>We’d love to hear from you! Fill out the form below or reach us directly through our social links.</p>
+
+    <form class="contact-form">
+      <label for="name">Your Name</label>
+      <input id="name" type="text" placeholder="Enter your name" class="input">
+      
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="Enter your email" class="input">
+
+      <label for="message">Message</label>
+      <textarea id="message" placeholder="Write your message..." class="input" style="min-height:120px;"></textarea>
+
+      <button type="button" class="btn" style="margin-top:12px;">Send</button>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <div>© TextOrigin</div>
+  <div class="social">
+    <a href="#">GitHub</a>
+    <a href="#">LinkedIn</a>
+    <a href="mailto:hello@textorigin.example">Email</a>
+  </div>
+</footer>
+</body>
+</html>
