@@ -3,7 +3,6 @@ import numpy as np
 import re
 import nltk
 import joblib
-import time
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
@@ -122,7 +121,7 @@ disp.plot()
 plt.savefig("confusion_matrix.png", dpi=300, bbox_inches="tight")
 plt.show()
 
-joblib.dump(tfidf_vector, "tfidf.pkl")
-joblib.dump(svd, "svd.pkl")
-joblib.dump(log_reg, "log_reg.pkl")
-booster.save_model("xgb_booster.json")
+joblib.dump(tfidf_vector, "models/tfidf.pkl")
+joblib.dump(svd, "models/svd.pkl")
+joblib.dump(log_reg, "models/log_reg.pkl")
+booster.save_model("models/xgb_booster.json")

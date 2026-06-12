@@ -5,12 +5,12 @@ from nltk.stem import WordNetLemmatizer
 import xgboost as xgb
 
 app = Flask(__name__)
+tfidf_vector = joblib.load("models/tfidf.pkl")
+svd = joblib.load("models/svd.pkl")
+log_reg = joblib.load("models/log_reg.pkl")
 
-tfidf_vector = joblib.load("tfidf.pkl")
-svd = joblib.load("svd.pkl")
-log_reg = joblib.load("log_reg.pkl")
 booster = xgb.Booster()
-booster.load_model("xgb_booster.json")
+booster.load_model("models/xgb_booster.json")
 
 REPLACE_BAD_WORD = re.compile(r'[/(){}\[\]\|@,;]')
 
