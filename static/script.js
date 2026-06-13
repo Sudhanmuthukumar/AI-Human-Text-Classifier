@@ -3,134 +3,144 @@ document.addEventListener("DOMContentLoaded", () => {
   const clearBtn = document.getElementById("clearBtn");
   const userText = document.getElementById("userText");
   const resultCard = document.getElementById("result");
+  const resultPlaceholder = document.getElementById("resultPlaceholder");
+  const warningCard = document.getElementById("warningCard");
+  const warningTitle = document.getElementById("warningTitle");
+  const warningDesc = document.getElementById("warningDesc");
   const scoreText = document.getElementById("scoreText");
   const meterFill = document.getElementById("meterFill");
+  const meterBox = document.getElementById("meterBox");
   const breakdown = document.getElementById("breakdown");
-  const warningMsg = document.getElementById("warningMsg");
+  const resultBadge = document.getElementById("resultBadge");
 
-  const exampleHumanBtn = document.getElementById("exampleHumanBtn");
-  const exampleAiBtn = document.getElementById("exampleAiBtn");
-
-  // Reset result card on load
-  resultCard.style.display = "none";
-  scoreText.textContent = "";
-  breakdown.innerHTML = "";
-
-  // Load saved text
-  if (localStorage.getItem("userText")) {
-    userText.value = localStorage.getItem("userText");
+  // Helpers to toggle the three output states
+  function showPlaceholder() {
+    if (resultPlaceholder) resultPlaceholder.style.display = "flex";
+    if (resultCard) resultCard.style.display = "none";
+    if (warningCard) warningCard.style.display = "none";
   }
 
-  // Hide warning on input
-  userText.addEventListener("input", () => {
-    if (userText.value.trim().length > 0) {
-      warningMsg.style.display = "none";
-    }
-  });
+  function showWarning(title, desc) {
+    if (resultPlaceholder) resultPlaceholder.style.display = "none";
+    if (resultCard) resultCard.style.display = "none";
+    if (warningCard) warningCard.style.display = "flex";
+    if (warningTitle) warningTitle.textContent = title;
+    if (warningDesc) warningDesc.textContent = desc;
+  }
 
-  // Sentiment display helper
-  function getSentimentDisplay(sentiment) {
+  function showResultCard() {
+    if (resultPlaceholder) resultPlaceholder.style.display = "none";
+    if (warningCard) warningCard.style.display = "none";
+    if (resultCard) resultCard.style.display = "flex";
+  }
+
+  // Initial state
+  showPlaceholder();
+
+  // Restore saved text
+  const saved = localStorage.getItem("userText");
+  if (saved) userText.value = saved;
+
+  // Sentiment helper
+  function sentimentStyle(sentiment) {
     switch (sentiment) {
-      case "Positive": return { emoji: "😊", color: "green" };
-      case "Negative": return { emoji: "😡", color: "red" };
-      default: return { emoji: "😐", color: "gray" };
+      case "Positive": return { emoji: "😊", color: "#4ade80" };
+      case "Negative": return { emoji: "😔", color: "#fb7185" };
+      default:         return { emoji: "😐", color: "#a1a1aa" };
     }
   }
 
-  // Display result
-  function displayResult(result) {
-    resultCard.style.display = "block";
-    scoreText.textContent = `Prediction: ${result.label} | Confidence: ${Math.max(result.ai_score, result.human_score)}%`;
-    meterFill.style.width = result.ai_score + "%";
+  // Render result
+  function showResult(r) {
+    showResultCard();
 
-    const { emoji, color } = getSentimentDisplay(result.sentiment);
+    const label = r.label.toLowerCase();
+    resultBadge.textContent = r.label;
+    resultBadge.className = `result-badge ${label}`;
 
-    breakdown.innerHTML = `<br>
-      <li><strong>Readability:</strong> ${result.readability}</li>
-      <br><li><strong>Vocabulary Diversity:</strong> ${result.vocab_diversity}</li>
-      <br><li><strong>Average Sentence Length:</strong> ${result.avg_sentence_length} words</li>
-      <br><li><strong>Sentiment:</strong> <span style="color:${color};">${result.sentiment} ${emoji}</span></li>
+    meterBox.className = `meter ${label}`;
+
+    const confidence = Math.max(r.ai_score, r.human_score);
+    scoreText.textContent = `${confidence}% confidence`;
+
+    meterFill.style.width = r.ai_score + "%";
+
+    const s = sentimentStyle(r.sentiment);
+
+    breakdown.innerHTML = `
+      <li class="metric-card">
+        <div class="metric-label">Readability</div>
+        <div class="metric-value">${r.readability}</div>
+      </li>
+      <li class="metric-card">
+        <div class="metric-label">Vocabulary</div>
+        <div class="metric-value">${r.vocab_diversity}</div>
+      </li>
+      <li class="metric-card">
+        <div class="metric-label">Avg. Sentence</div>
+        <div class="metric-value">${r.avg_sentence_length} <span style="font-size:12px;color:var(--text-tertiary)">words</span></div>
+      </li>
+      <li class="metric-card">
+        <div class="metric-label">Sentiment</div>
+        <div class="metric-value" style="color:${s.color}">${r.sentiment} ${s.emoji}</div>
+      </li>
     `;
   }
 
-  // Check button
+  // Analyze
   checkBtn.addEventListener("click", async () => {
     const text = userText.value.trim();
+
     if (!text) {
-      warningMsg.style.display = "block";
-      resultCard.style.display = "none";
-      breakdown.innerHTML = "";
+      showWarning("No text entered", "Paste or type some text on the left, then click Analyze.");
       return;
     }
 
     if (text.length < 250) {
-      alert("Please enter at least 250 characters.");
+      const remaining = 250 - text.length;
+      showWarning(
+        "Not enough text",
+        `You need at least 250 characters for accurate analysis. Add ${remaining} more character${remaining === 1 ? "" : "s"}.`
+      );
       return;
     }
 
-    warningMsg.style.display = "none";
     localStorage.setItem("userText", text);
 
-    scoreText.textContent = "Analyzing...";
-    resultCard.style.display = "block";
+    // Loading state
+    showResultCard();
+    resultBadge.textContent = "Analyzing";
+    resultBadge.className = "result-badge";
+    scoreText.textContent = "Reading your text…";
     meterFill.style.width = "0%";
-    breakdown.textContent = "";
+    breakdown.innerHTML = "";
 
     try {
-      const response = await fetch("/predict", {
+      const res = await fetch("/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       });
 
-      const result = await response.json();
-      if (result.error) {
-        alert(result.error);
-        resultCard.style.display = "none";
+      const data = await res.json();
+      if (data.error) {
+        showWarning("Analysis failed", data.error);
         return;
       }
 
-      localStorage.setItem("lastResult", JSON.stringify(result));
-      displayResult(result);
+      localStorage.setItem("lastResult", JSON.stringify(data));
+      showResult(data);
     } catch (err) {
       console.error(err);
-      alert("Error connecting to server.");
-      resultCard.style.display = "none";
+      showWarning("Connection error", "Could not reach the server. Please make sure it's running and try again.");
     }
   });
 
-  // Clear button
+  // Clear
   clearBtn.addEventListener("click", () => {
     userText.value = "";
-    resultCard.style.display = "none";
-    warningMsg.style.display = "none";
+    showPlaceholder();
     localStorage.removeItem("userText");
     localStorage.removeItem("lastResult");
   });
-
-  // Example buttons
-  if (exampleHumanBtn) {
-    exampleHumanBtn.addEventListener("click", () => {
-      const humanSamples = [
-        "I am a student of Saranathan College of Engineering perusing a B.E degree in Computer Science and Engineering and I want to become a Data Scientist. I will become one.",
-        "I felt sorrow for my uncle who had just met with an accident. I went to see him in the Hospital."
-      ];
-      const sampleText = humanSamples[Math.floor(Math.random() * humanSamples.length)];
-      userText.value = sampleText;
-      localStorage.setItem("userText", sampleText);
-    });
-  }
-
-  if (exampleAiBtn) {
-    exampleAiBtn.addEventListener("click", () => {
-      const aiSamples = [
-        "Today was incredible. The team finally launched the project we’ve been working on for months, and the feedback was overwhelmingly positive. Everyone was smiling, high-fiving, and celebrating the win. It felt like all the late nights were worth it.",
-        "The quarterly report indicates a 3.2% increase in user engagement, primarily driven by mobile traffic. Conversion rates remained stable, while bounce rates showed a slight decline across key landing pages.",
-        "Her reaction was not impulsive—it was calculated fury. The betrayal she endured had eroded every ounce of trust, replacing it with a cold, simmering resentment. She no longer sought reconciliation; she sought accountability."
-      ];
-      const sampleText = aiSamples[Math.floor(Math.random() * aiSamples.length)];
-      userText.value = sampleText;
-      localStorage.setItem("userText", sampleText);
-    });
-  }
 });

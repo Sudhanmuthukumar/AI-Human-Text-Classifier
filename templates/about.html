@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>About - TextOrigin</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Learn how TextOrigin works — readability scoring, vocabulary analysis, sentence patterns, and sentiment detection." />
+  <title>About — TextOrigin</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -19,38 +21,51 @@
   </div>
 </header>
 
-<main class="container">
+<main class="container-narrow">
   <section class="page">
-    <h2>About TextOrigin</h2>
+    <h2>What is TextOrigin?</h2>
     <p>
-      TextOrigin is a simple tool that helps you check if a piece of writing
-      was likely written by a human or by AI. It’s built for students, teachers,
-      and professionals who want quick and clear answers about their text.
+      TextOrigin helps you figure out whether a piece of writing sounds like it came from a person or from an AI model.
+      It's built for students, educators, writers, and anyone who's curious about the text they're reading.
+    </p>
+    <p>
+      Rather than giving you a simple yes-or-no answer, it breaks things down so you can see <em>why</em> the text
+      leans one way or the other.
     </p>
 
-    <h3>Our Main Features</h3>
-    <ul class="metrics">
-      <li><strong>Readability:</strong> Shows how easy or hard your text is to read.</li>
-      <li><strong>Vocabulary:</strong> Checks how many different words you use, to see how varied your writing is.</li>
-      <li><strong>Sentence Length:</strong> Measures the average number of words in each sentence, which helps show clarity.</li>
-      <li><strong>Sentiment:</strong> Finds the feeling in your text — Positive 😊, Negative 😡, or Neutral 😐 — so you know the mood it gives off.</li>
+    <h3>How it works</h3>
+    <ul class="feature-list">
+      <li class="feature-item">
+        <strong>Readability</strong>
+        <span>Measures how easy or complex the writing is, based on established linguistic formulas.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Vocabulary diversity</strong>
+        <span>Checks how varied the word choices are — repetitive patterns often point to AI generation.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Sentence structure</strong>
+        <span>Looks at sentence length distribution. Uniform phrasing can be a sign of machine output.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Sentiment</strong>
+        <span>Picks up the emotional tone — positive, negative, or neutral — to give you a fuller picture.</span>
+      </li>
     </ul>
 
     <p>
-      By combining these features with smart machine learning models,
-      TextOrigin gives you not just a score, but also useful insights
-      into your writing. Our goal is to make AI detection clear, simple,
-      and easy for everyone to use.
+      Under the hood, TextOrigin combines TF-IDF feature extraction with an XGBoost + Logistic Regression ensemble
+      to produce its predictions. It's not perfect, but it's a useful starting point.
     </p>
   </section>
 </main>
 
 <footer>
-  <div>© TextOrigin</div>
+  <div>&copy; TextOrigin</div>
   <div class="social">
     <a href="#">GitHub</a>
     <a href="#">LinkedIn</a>
-    <a href="mailto:hello@example.com">Email</a>
+    <a href="mailto:hello@textorigin.example">Email</a>
   </div>
 </footer>
 </body>
