@@ -142,10 +142,7 @@ python app.py
 
 ---
 
-## Author
+## Maintainer
 
-Sudhan M
+GitHub: @Sudhanmuthukumar
 
-B.E. Computer Science and Engineering
-
-Interested in Machine Learning, NLP, AI Systems, and Software Development.
