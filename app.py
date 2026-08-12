@@ -1,9 +1,3 @@
-import nltk
-
-nltk.download("stopwords", quiet=True)
-nltk.download("wordnet", quiet=True)
-nltk.download("omw-1.4", quiet=True)
-
 from flask import Flask, render_template, request, jsonify
 import joblib, re, nltk, numpy as np, textstat
 from nltk.corpus import stopwords
