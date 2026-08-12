@@ -719,6 +719,131 @@ footer .social a:hover {
 }
 
 /* ========================================
+   EMOTION ANALYSIS
+   ======================================== */
+.emotion-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.emotion-heading {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.emotion-dominant {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.emotion-dominant-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+.emotion-dominant-value {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Emotion bar rows */
+.emotion-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.emotion-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.emotion-bar-label {
+  width: 110px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.emotion-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.emotion-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--primary), var(--primary-soft));
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.emotion-bar-pct {
+  width: 42px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* Emotion words */
+.emotion-words-section {
+  padding-top: 16px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.emotion-words-heading {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.emotion-words-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.emotion-word-group {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.emotion-word-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.emotion-word-list {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* ========================================
    RESPONSIVE
    ======================================== */
 

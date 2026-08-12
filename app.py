@@ -3,6 +3,7 @@ import joblib, re, nltk, numpy as np, textstat
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import xgboost as xgb
+from nrclex import NRCLex
 
 app = Flask(__name__)
 tfidf_vector = joblib.load("models/tfidf.pkl")
@@ -38,131 +39,48 @@ def extract_linguistic_features(text):
     avg_sent_len = np.mean([len(s.split()) for s in text.split('.') if s.strip()]) if '.' in text else len(words)
     return np.array([readability, vocab_div, avg_sent_len])
 
-sentiment_lexicon = {
 
-    "joy": (1, 3), "bliss": (1, 3), "ecstatic": (1, 3), "jubilant": (1, 3),
-    "euphoric": (1, 3), "triumph": (1, 3), "love": (1, 3), "adore": (1, 3),
-    "cherish": (1, 3), "perfect": (1, 3),
 
-    "wonderful": (1, 2), "amazing": (1, 2), "awesome": (1, 2),
-    "fantastic": (1, 2), "brilliant": (1, 2),
-    "laugh": (1, 2), "laughing": (1, 2),
-    "happy": (1, 2), "delight": (1, 2),
-    "elated": (1, 2), "glad": (1, 2),
-    "excited": (1, 2), "enthusiastic": (1, 2),
-    "proud": (1, 2), "hope": (1, 2),
-    "satisfaction": (1, 2),
+NRC_EMOTIONS = ["anger", "anticipation", "disgust", "fear", "joy", "sadness", "surprise", "trust"]
 
-    "cheerful": (1, 1), "content": (1, 1), "optimistic": (1, 1),
-    "energetic": (1, 1), "peaceful": (1, 1),
-    "confident": (1, 1), "successful": (1, 1),
-    "thankful": (1, 1), "loving": (1, 1),
-    "inspired": (1, 1), "like": (1, 1),
-    "enjoy": (1, 1), "appreciate": (1, 1),
-    "smile": (1, 1), "cool": (1, 1),
+def analyze_emotions(text):
+    """Use NRCLex to extract emotion percentages and trigger words for the 8 NRC emotions."""
+    emotion_obj = NRCLex(text)
+    emotion_obj.load_raw_text(text)
+    raw_scores = emotion_obj.raw_emotion_scores
 
-    "sadness": (-1, 3), "agony": (-1, 3), "grief": (-1, 3),
-    "despair": (-1, 3), "misery": (-1, 3),
-    "terrible": (-1, 3), "horrible": (-1, 3),
-    "worst": (-1, 3), "devastated": (-1, 3),
+    # Filter to only the 8 target emotions
+    filtered = {e: raw_scores.get(e, 0) for e in NRC_EMOTIONS}
+    total = sum(filtered.values())
 
-    "sad": (-1, 2), "depressed": (-1, 2),
-    "lonely": (-1, 2), "gloomy": (-1, 2),
-    "hopeless": (-1, 2), "heartbroken": (-1, 2),
-    "fail": (-1, 2), "failure": (-1, 2),
-    "cry": (-1, 2),
-
-    "unhappy": (-1, 1), "disappointed": (-1, 1),
-    "hurt": (-1, 1), "ashamed": (-1, 1),
-    "guilty": (-1, 1), "empty": (-1, 1),
-    "bored": (-1, 1), "tired": (-1, 1),
-    "bad": (-1, 1),
-
-    "anger": (-1, 3), "furious": (-1, 3),
-    "rage": (-1, 3), "hate": (-1, 3),
-    "mad": (-1, 2), "frustrated": (-1, 2),
-    "annoyed": (-1, 2), "hostile": (-1, 2),
-    "upset": (-1, 1),
-
-    "fear": (-1, 3), "panic": (-1, 3),
-    "terrified": (-1, 3),
-    "scared": (-1, 2), "afraid": (-1, 2),
-    "anxious": (-1, 1), "worried": (-1, 1),
-    "stressed": (-1, 1),
-
-    "disgust": (-1, 3), "disgusted": (-1, 2),
-    "gross": (-1, 2), "nasty": (-1, 2),
-    "awful": (-1, 1)
-}
-
-intensifiers = {
-    "very": 1.5, "really": 1.5, "extremely": 2.0, "absolutely": 2.0,
-    "more": 1.2, "most": 1.5, "so": 1.2,
-    "slightly": 0.5, "little": 0.5, "hardly": 0.5
-}
-
-negations = {
-    "not", "no", "never", "cannot", "can't",
-    "don't", "didn't", "doesn't",
-    "isn't", "aren't", "wasn't", "weren't",
-    "hasn't", "haven't", "hadn't",
-    "without", "hardly"
-}
-
-stoppers = {
-    "but", "however", "though", "although", "yet"
-}
-
-def sentiment_from_text(text):
-    clauses = re.split(r"[,.]", text.lower())
-    clause_scores = []
-
-    for clause in clauses:
-        words = re.findall(r"\b\w+'\w+|\w+\b", clause)
-
-        score = 0.0
-        neg_count = 0
-        intensity = 1.0
-
-        for word in words:
-            if word in stoppers:
-                score *= 0.5
-                neg_count = 0
-                intensity = 1.0
-                continue
-
-            if word in negations:
-                neg_count += 1
-                continue
-
-            if word in intensifiers:
-                intensity *= intensifiers[word]
-                continue
-
-            if word in sentiment_lexicon:
-                polarity, weight = sentiment_lexicon[word]
-                value = polarity * weight * intensity
-
-                if neg_count % 2 == 1:
-                    value *= -1
-                    value *= 0.8
-
-                score += value
-                neg_count = 0
-                intensity = 1.0
-
-        clause_scores.append(score)
-
-    final_score = 0.0
-    for i, sc in enumerate(clause_scores):
-        final_score += sc * (1 + i * 0.5)
-
-    if final_score > 0.5:
-        return "Positive"
-    elif final_score < -0.5:
-        return "Negative"
+    # Percentage distribution
+    if total > 0:
+        emotions_pct = {e: round((v / total) * 100, 1) for e, v in filtered.items()}
     else:
-        return "Neutral"
+        emotions_pct = {e: 0 for e in NRC_EMOTIONS}
+
+    # Dominant emotion
+    if total > 0:
+        dominant = max(filtered, key=filtered.get)
+    else:
+        dominant = "No emotion detected"
+
+    # Words that triggered each emotion
+    affect_dict = emotion_obj.affect_dict  # word -> list of emotions
+    emotion_words = {e: [] for e in NRC_EMOTIONS}
+    for word, emo_list in affect_dict.items():
+        for emo in emo_list:
+            if emo in emotion_words and word not in emotion_words[emo]:
+                emotion_words[emo].append(word)
+
+    # Remove empty entries
+    emotion_words_filtered = {e: wds for e, wds in emotion_words.items() if wds}
+
+    return {
+        "dominant_emotion": dominant,
+        "emotions": emotions_pct,
+        "emotion_words": emotion_words_filtered
+    }
 
 def predict_text(text):
     cleaned = clean_text(text)
@@ -186,18 +104,21 @@ def predict_text(text):
     else:
         label = "Human"
 
-    sentiment = sentiment_from_text(text)
     readability, vocab_div, avg_sent_len = ling[0]
 
-    return {
+    # Emotion analysis (independent of AI detection)
+    emotion_data = analyze_emotions(text)
+
+    result = {
         "label": label,
         "ai_score": round(ai_score * 100, 2),
         "human_score": round(human_score * 100, 2),
         "readability": round(float(readability), 2),
         "vocab_diversity": round(float(vocab_div), 2),
-        "avg_sentence_length": round(float(avg_sent_len), 2),
-        "sentiment": sentiment
+        "avg_sentence_length": round(float(avg_sent_len), 2)
     }
+    result.update(emotion_data)
+    return result
 
 @app.route("/")
 def index():

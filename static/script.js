@@ -41,14 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const saved = localStorage.getItem("userText");
   if (saved) userText.value = saved;
 
-  // Sentiment helper
-  function sentimentStyle(sentiment) {
-    switch (sentiment) {
-      case "Positive": return { emoji: "😊", color: "#4ade80" };
-      case "Negative": return { emoji: "😔", color: "#fb7185" };
-      default:         return { emoji: "😐", color: "#a1a1aa" };
-    }
-  }
 
   // Render result
   function showResult(r) {
@@ -65,8 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     meterFill.style.width = r.ai_score + "%";
 
-    const s = sentimentStyle(r.sentiment);
-
     breakdown.innerHTML = `
       <li class="metric-card">
         <div class="metric-label">Readability</div>
@@ -80,11 +70,59 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="metric-label">Avg. Sentence</div>
         <div class="metric-value">${r.avg_sentence_length} <span style="font-size:12px;color:var(--text-tertiary)">words</span></div>
       </li>
-      <li class="metric-card">
-        <div class="metric-label">Sentiment</div>
-        <div class="metric-value" style="color:${s.color}">${r.sentiment} ${s.emoji}</div>
-      </li>
     `;
+
+    // === Emotion Analysis ===
+    const emotionSection = document.getElementById("emotionSection");
+    const dominantEmotion = document.getElementById("dominantEmotion");
+    const emotionBars = document.getElementById("emotionBars");
+    const emotionWords = document.getElementById("emotionWords");
+    const emotionWordsSection = document.getElementById("emotionWordsSection");
+
+    if (r.emotions && r.dominant_emotion) {
+      emotionSection.style.display = "block";
+
+      // Emoji map for emotions
+      const emojiMap = {
+        anger: "😠", anticipation: "🤔", disgust: "🤢", fear: "😨",
+        joy: "😊", sadness: "😢", surprise: "😲", trust: "🤝"
+      };
+
+      dominantEmotion.textContent = `${emojiMap[r.dominant_emotion] || ""} ${r.dominant_emotion.charAt(0).toUpperCase() + r.dominant_emotion.slice(1)}`;
+
+      // Emotion distribution bars
+      let barsHtml = "";
+      const emotions = r.emotions;
+      for (const [emo, pct] of Object.entries(emotions)) {
+        barsHtml += `
+          <div class="emotion-bar-row">
+            <span class="emotion-bar-label">${emojiMap[emo] || ""} ${emo.charAt(0).toUpperCase() + emo.slice(1)}</span>
+            <div class="emotion-bar-track">
+              <div class="emotion-bar-fill" style="width:${pct}%"></div>
+            </div>
+            <span class="emotion-bar-pct">${pct}%</span>
+          </div>`;
+      }
+      emotionBars.innerHTML = barsHtml;
+
+      // Emotion words
+      if (r.emotion_words && Object.keys(r.emotion_words).length > 0) {
+        emotionWordsSection.style.display = "block";
+        let wordsHtml = "";
+        for (const [emo, words] of Object.entries(r.emotion_words)) {
+          wordsHtml += `
+            <div class="emotion-word-group">
+              <span class="emotion-word-label">${emojiMap[emo] || ""} ${emo.charAt(0).toUpperCase() + emo.slice(1)}</span>
+              <span class="emotion-word-list">${words.join(", ")}</span>
+            </div>`;
+        }
+        emotionWords.innerHTML = wordsHtml;
+      } else {
+        emotionWordsSection.style.display = "none";
+      }
+    } else {
+      emotionSection.style.display = "none";
+    }
   }
 
   // Analyze
